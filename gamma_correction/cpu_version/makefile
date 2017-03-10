@@ -1,2 +1,8 @@
+LDFLAGS +=  $(shell pkg-config --libs opencv)
+CXXFLAGS +=  $(shell pkg-config --cflags opencv)
 main: main.cu aux.cu aux.h
-	nvcc -o main main.cu aux.cu --ptxas-options=-v --use_fast_math -arch sm_35 --compiler-options -Wall -lopencv_highgui -lopencv_core
+	nvcc main.cu aux.cu  -o main $(LDFLAGS) $(CXXFLAGS)
+
+.PHONY: clean
+clean:
+	-rm -rf main

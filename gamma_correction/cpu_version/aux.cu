@@ -53,6 +53,27 @@ void showImage(string title, const cv::Mat &mat, int x, int y){
 	cv::imshow(wTitle, mat);
 }
 
+void convert_interleaved_to_layered(float *aOut, const float *aIn, int w, int h, int nc)
+{
+    if (nc==1) { memcpy(aOut, aIn, w*h*sizeof(float)); return; }
+    size_t nOmega = (size_t)w*h;
+    for (int y=0; y<h; y++)
+    {
+        for (int x=0; x<w; x++)
+        {
+            for (int c=0; c<nc; c++)
+            {
+                aOut[x + (size_t)w*y + nOmega*c] = aIn[(nc-1-c) + nc*(x + (size_t)w*y)];
+            }
+        }
+    }
+}
+void convert_mat_to_layered(float *aOut, const cv::Mat &mIn)
+{
+    convert_interleaved_to_layered(aOut, (float*)mIn.data, mIn.cols, mIn.rows, mIn.channels());
+}
+
+
 void showHistogram256(const char* windowTitle, int* histogram, int windowX, int windowY){
 	const int nbins = 256;
 	cv::Mat canvas = cv::Mat::ones(125, 512, CV_8UC3);
